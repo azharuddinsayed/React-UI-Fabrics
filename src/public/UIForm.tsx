@@ -83,7 +83,7 @@ export const UIFrom: React.FunctionComponent<IButtonExampleProps> = props => {
             placeholder="I am disabled"
           />
         </Stack>
-        {/* <Stack horizontal tokens={stackTokens}>
+        <Stack horizontal tokens={stackTokens}>
           <DefaultButton
             text="Standard"
             onClick={_alertClicked}
@@ -98,7 +98,7 @@ export const UIFrom: React.FunctionComponent<IButtonExampleProps> = props => {
             disabled={disabled}
             checked={checked}
           />
-        </Stack> */}
+        </Stack>
       </Stack>
     </Stack>
   );

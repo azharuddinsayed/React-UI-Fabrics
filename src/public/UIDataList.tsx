@@ -104,6 +104,7 @@ export class UIDataList extends React.Component<
         fieldName: "name",
         minWidth: 16,
         maxWidth: 16,
+        onColumnClick: this._onColumnClick,
         onRender: (item: IDocument) => {
           return (
             <img
@@ -126,6 +127,7 @@ export class UIDataList extends React.Component<
         isSortedDescending: false,
         sortAscendingAriaLabel: "Sorted A to Z",
         sortDescendingAriaLabel: "Sorted Z to A",
+        onColumnClick: this._onColumnClick,
         data: "string",
         isPadded: true
       },
@@ -136,6 +138,7 @@ export class UIDataList extends React.Component<
         minWidth: 70,
         maxWidth: 90,
         isResizable: true,
+        onColumnClick: this._onColumnClick,
         data: "number",
         onRender: (item: IDocument) => {
           return <span>{item.dateModified}</span>;
@@ -151,6 +154,7 @@ export class UIDataList extends React.Component<
         isResizable: true,
         isCollapsible: true,
         data: "string",
+        onColumnClick: this._onColumnClick,
         onRender: (item: IDocument) => {
           return <span>{item.modifiedBy}</span>;
         },
@@ -165,6 +169,7 @@ export class UIDataList extends React.Component<
         isResizable: true,
         isCollapsible: true,
         data: "number",
+        onColumnClick: this._onColumnClick,
         onRender: (item: IDocument) => {
           return <span>{item.fileSize}</span>;
         }
@@ -174,7 +179,7 @@ export class UIDataList extends React.Component<
     this._selection = new Selection({
       onSelectionChanged: () => {
         this.setState({
-          // selectionDetails: this._getSelectionDetails()
+          selectionDetails: this._getSelectionDetails()
         });
       }
     });
@@ -182,6 +187,7 @@ export class UIDataList extends React.Component<
     this.state = {
       items: this._allItems,
       columns: columns,
+      selectionDetails: this._getSelectionDetails(),
       isModalSelection: false,
       isCompactMode: false,
       announcedMessage: undefined
@@ -200,6 +206,33 @@ export class UIDataList extends React.Component<
 
     return (
       <Fabric>
+        <div className={classNames.controlWrapper}>
+          <Toggle
+            label="Enable compact mode"
+            checked={isCompactMode}
+            onText="Compact"
+            offText="Normal"
+            styles={controlStyles}
+          />
+          <Toggle
+            label="Enable modal selection"
+            checked={isModalSelection}
+            onText="Modal"
+            offText="Normal"
+            styles={controlStyles}
+          />
+          <TextField label="Filter by name:" styles={controlStyles} />
+          <Announced
+            message={`Number of items after filter applied: ${items.length}.`}
+          />
+        </div>
+        <div className={classNames.selectionDetails}>{selectionDetails}</div>
+        <Announced message={selectionDetails} />
+        {announcedMessage ? (
+          <Announced message={announcedMessage} />
+        ) : (
+          undefined
+        )}
         {isModalSelection ? (
           <MarqueeSelection selection={this._selection}>
             <DetailsList
@@ -237,43 +270,86 @@ export class UIDataList extends React.Component<
     );
   }
 
+  public componentDidUpdate(
+    previousProps: any,
+    previousState: IDetailsListDocumentsExampleState
+  ) {
+    if (
+      previousState.isModalSelection !== this.state.isModalSelection &&
+      !this.state.isModalSelection
+    ) {
+      this._selection.setAllSelected(false);
+    }
+  }
+
   private _getKey(item: any, index?: number): string {
     return item.key;
   }
 
-  // private _onColumnClick = (
-  //   ev: React.MouseEvent<HTMLElement>,
-  //   column: IColumn
-  // ): void => {
-  //   const { columns, items } = this.state;
-  //   const newColumns: IColumn[] = columns.slice();
-  //   const currColumn: IColumn = newColumns.filter(
-  //     currCol => column.key === currCol.key
-  //   )[0];
-  //   newColumns.forEach((newCol: IColumn) => {
-  //     if (newCol === currColumn) {
-  //       currColumn.isSortedDescending = !currColumn.isSortedDescending;
-  //       currColumn.isSorted = true;
-  //       this.setState({
-  //         announcedMessage: `${currColumn.name} is sorted ${
-  //           currColumn.isSortedDescending ? "descending" : "ascending"
-  //         }`
-  //       });
-  //     } else {
-  //       newCol.isSorted = false;
-  //       newCol.isSortedDescending = true;
-  //     }
-  //   });
-  //   const newItems = _copyAndSort(
-  //     items,
-  //     currColumn.fieldName!,
-  //     currColumn.isSortedDescending
-  //   );
-  //   this.setState({
-  //     columns: newColumns,
-  //     items: newItems
-  //   });
-  // };
+  private _onChangeText = (
+    ev: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
+    text: string
+  ): void => {
+    this.setState({
+      items: text
+        ? this._allItems.filter(i => i.name.toLowerCase().indexOf(text) > -1)
+        : this._allItems
+    });
+  };
+
+  private _onItemInvoked(item: any): void {
+    alert(`Item invoked: ${item.name}`);
+  }
+
+  private _getSelectionDetails(): string {
+    const selectionCount = this._selection.getSelectedCount();
+
+    switch (selectionCount) {
+      case 0:
+        return "No items selected";
+      case 1:
+        return (
+          "1 item selected: " +
+          (this._selection.getSelection()[0] as IDocument).name
+        );
+      default:
+        return `${selectionCount} items selected`;
+    }
+  }
+
+  private _onColumnClick = (
+    ev: React.MouseEvent<HTMLElement>,
+    column: IColumn
+  ): void => {
+    const { columns, items } = this.state;
+    const newColumns: IColumn[] = columns.slice();
+    const currColumn: IColumn = newColumns.filter(
+      currCol => column.key === currCol.key
+    )[0];
+    newColumns.forEach((newCol: IColumn) => {
+      if (newCol === currColumn) {
+        currColumn.isSortedDescending = !currColumn.isSortedDescending;
+        currColumn.isSorted = true;
+        this.setState({
+          announcedMessage: `${currColumn.name} is sorted ${
+            currColumn.isSortedDescending ? "descending" : "ascending"
+          }`
+        });
+      } else {
+        newCol.isSorted = false;
+        newCol.isSortedDescending = true;
+      }
+    });
+    const newItems = _copyAndSort(
+      items,
+      currColumn.fieldName!,
+      currColumn.isSortedDescending
+    );
+    this.setState({
+      columns: newColumns,
+      items: newItems
+    });
+  };
 }
 
 function _copyAndSort<T>(
