@@ -55,12 +55,12 @@ export const App: React.FunctionComponent = () => {
           <UIDataList />
         </PivotItem>
       </Pivot>
-      <Customizer {...FluentCustomizations}>
+      {/* <Customizer {...FluentCustomizations}>
         <Stack style={{ maxHeight: "500px", overflow: "scroll" }}>
           <UIFrom />
           <UIDataList />
         </Stack>
-      </Customizer>
+      </Customizer> */}
       {/* <Stack horizontal gap={15} horizontalAlign="center">
         <Link href="/UiForm">UiForms</Link>
         <Link href="https://developer.microsoft.com/en-us/fabric">Docs</Link>
