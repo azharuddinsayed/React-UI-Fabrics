@@ -6,16 +6,18 @@ import {
   FontWeights,
   Pivot,
   PivotItem,
-  PivotLinkFormat
+  PivotLinkFormat,
+  Calendar
 } from "office-ui-fabric-react";
 import { BrowserRouter, Route, Redirect } from "react-router-dom";
 import { UIFrom } from "./public/UIForm";
 import { UIDataList } from "./public/UIDataList";
+import { Calender } from "./public/calender";
 import { Customizer } from "office-ui-fabric-react";
 import { FluentCustomizations } from "@uifabric/fluent-theme";
 
 import logo from "./fabric.png";
-
+//import "./styles/UiFabrics.scss";
 const boldStyle = {
   root: { fontWeight: FontWeights.semibold }
 };
@@ -53,6 +55,9 @@ export const App: React.FunctionComponent = () => {
         </PivotItem>
         <PivotItem headerText="UiDataSet">
           <UIDataList />
+        </PivotItem>
+        <PivotItem headerText="calender">
+          <Calender />
         </PivotItem>
       </Pivot>
       {/* <Customizer {...FluentCustomizations}>

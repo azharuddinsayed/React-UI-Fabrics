@@ -1,5 +1,5 @@
 import React from "react";
-import "../styles/UIFabrics.css";
+//import "../styles/UIFabrics.css";
 import { TextField } from "office-ui-fabric-react/lib/TextField";
 import { Toggle } from "office-ui-fabric-react/lib/Toggle";
 import { Fabric } from "office-ui-fabric-react/lib/Fabric";
